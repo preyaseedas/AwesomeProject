@@ -16,14 +16,6 @@ function SplashScreen() {
         source={require('../asset/image/app_logo.png')}
         style={styles.logoImg}
       />
-       <Image
-        source={require('../asset/image/app_logo.png')}
-        style={styles.logoImg}
-      />
-       <Image
-        source={require('../asset/image/app_logo.png')}
-        style={styles.logoImg}
-      />
     </View>
   );
 }
