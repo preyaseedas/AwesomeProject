@@ -21,6 +21,11 @@ export default function AddEditNote() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [currentPage, setCurrentPage] = useState();
 
+  //usestate for title
+  const [title, setTitle] = useState('');
+  //usestate  for description
+  const [description, setDescription] = useState('');
+
   const toggleThemeModal = () => {
     setThemeModalVisible(!isThemeModalVisible);
   };
@@ -30,53 +35,31 @@ export default function AddEditNote() {
     setThemeModalVisible(false);
   };
 
-  const data = [
-    {id: '1', title: 'Cancel'},
-    {id: '2', title: 'Save'},
-  ];
-
-  //const actions = [];
-
-  const toggleChip = id => {
-    setSelectedItems(prev =>
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id],
-    );
-    {
-      /* if(id==2){
-      setSelectedItems(   onPress= {
-        navigation.navigate('AddNote')
-      })
-    }  */
-    }
-  };
-
-  const renderItem = ({item}) => {
-    const isSelected = selectedItems.includes(item.id);
-    return (
-      <TouchableOpacity
-        style={[
-          styles.chip,
-          {backgroundColor: isSelected ? '#0B162B' : 'transparent'},
-        ]}
-        onPress={() => toggleChip(item.id)}>
-        <Text
-          style={[styles.chipText, {color: isSelected ? '#fff' : '#0B162B'}]}>
-          {item.title}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
-
   return (
     <View style={styles.container}>
-      <TextInput style={styles.title}>Title</TextInput>
+      <TextInput
+        style={styles.title}
+        placeholder="Title"
+        value={title}
+        onChangeText={text => {
+          setTitle(text);
+        }}
+      />
       <View
         style={{
           flex: 1,
           justifyContent: 'flex-start',
           backgroundColor: 'transparent',
         }}>
-        <TextInput style={styles.para}>Write Something</TextInput>
+        <TextInput
+          style={styles.para}
+          value={description}
+          placeholder="Write Something"
+          multiline={true}
+          onChangeText={x => {
+            setDescription(x);
+          }}
+        />
       </View>
 
       <View style={styles.iconbar}>
@@ -178,14 +161,6 @@ export default function AddEditNote() {
                   />
                 </TouchableOpacity>
               </View>
-              <FlatList
-                data={data}
-                renderItem={renderItem}
-                keyExtractor={item => item.id}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.flatListContent}
-              />
             </View>
           </View>
         </Modal>
@@ -256,8 +231,7 @@ export const styles = StyleSheet.create({
     height: 58,
     width: 58,
   },
-  flatListContent:{ marginLeft:'45%'
-  }, 
+  flatListContent: {marginLeft: '45%'},
   chip: {
     marginVertical: 0,
     marginTop: 30,
