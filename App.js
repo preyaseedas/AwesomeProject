@@ -5,7 +5,9 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import HomeScreen from './src/screens/HomeScreen';
 import AddEditNote from './src/screens/AddEditNote';
-import WorkPage from './src/screens/workPage';
+
+import Reminder from './src/screens/Reminder.js';
+import Card from './src/screens/Card.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -13,11 +15,12 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{headerShown: false}}>
-    
-     
         <Stack.Screen name="Splash" component={SplashScreen} />
+
         <Stack.Screen name="Home" component={HomeScreen} />
+
         <Stack.Screen name="AddNote" component={AddEditNote} />
+        <Stack.Screen name="Remind" component={Reminder} />
       </Stack.Navigator>
     </NavigationContainer>
   );
