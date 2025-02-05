@@ -43,31 +43,9 @@ export default function AddEditNote() {
   const toggleThemeModal = () => {
     setThemeModalVisible(!isThemeModalVisible);
   };
+
   const toggleReminderModal = () => {
     setReminderModalVisible(!isReminderModalVisible);
-  };
-  const categoryControl = () => {
-    // Temporarily store the selected theme
-    setCategoryModalVisible(false);
-  };
-
-  const themesFrame = {
-    Frame_59: require('../asset/image/Frame_59.png'),
-    Frame_60: require('../asset/image/Frame_60.png'),
-    Frame_61: require('../asset/image/Frame_61.png'),
-    Frame_62: require('../asset/image/Frame_62.png'),
-    // Add all other themes
-  };
-
-  const selectTheme = select => {
-    setSelectedTheme(select);
-  };
-  const selectThemeCategoryBack = () => {
-    // Apply the selected theme as the background for category
-    if (selectedTheme) {
-      setTheme(selectedTheme);
-    }
-    setThemeModalVisible(false);
   };
 
   /**
@@ -235,6 +213,8 @@ export default function AddEditNote() {
           />
         </TouchableOpacity>
       </View>
+
+      {/** Model UI for Theme */}
       <Modal
         visible={isThemeModalVisible}
         animationType="slide"
@@ -294,15 +274,15 @@ export default function AddEditNote() {
                 }}>
                 <Text style={{marginTop: 10}}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={SaveButton.structure}
-                onPress={selectThemeCategoryBack}>
+              <TouchableOpacity style={SaveButton.structure} onPress={() => {}}>
                 <Text style={SaveButton.text}>Save</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
+
+      {/** Modal UI for Category choose*/}
       <Modal
         visible={isCategoryModalVisible}
         onRequestClose={() => {
