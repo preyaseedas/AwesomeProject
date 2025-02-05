@@ -29,7 +29,7 @@ export default function AddEditNote() {
   const [isCategoryModalVisible, setCategoryModalVisible] = useState(false); //TO SET THEME IN WHICH CATEGORY
   const [selectedId, setSelectedId] = useState(null); //for radio box selection
 
-  const [addCategory, setAddCategory] = useState('Add Category');
+  const [addCategoryTxt, setAddCategoryTxt] = useState('');
 
   const [isReminderModalVisible, setReminderModalVisible] = useState(true);
 
@@ -70,11 +70,36 @@ export default function AddEditNote() {
     setThemeModalVisible(false);
   };
 
-  const BackgroundThemeControl = () => {
-    // Apply the selected theme as the background finally
-    setCategoryModalVisible(false);
+  /**
+   * This method will create a new category using a POST API
+   */
+  const postCategory = async () => {
+    let body = {
+      name: addCategoryTxt,
+      description: addCategoryTxt,
+    };
+
+    const response = await fetch('http://localhost:3000/api/categories', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    const outPut = await response.json();
+    console.log('output', outPut);
+
+    // To clear the typed category text from the user input
+    setAddCategoryTxt('');
+
+    //Get updated category list after creating a new category
+    getAllCategory();
   };
 
+  /**
+   * postNote method is used to create note from user input using POST API
+   */
   const postNote = async () => {
     console.log('Start Api Calling');
 
@@ -98,13 +123,18 @@ export default function AddEditNote() {
     const json = await response.json();
     console.log('apiOut', json);
 
-    navigation.navigate('Home');
+    // navigation.navigate('Home');
   };
+
+  // to execute get all categories 1st time and once when screen is opened
   useEffect(() => {
-    getCategory();
+    getAllCategory();
   }, []);
 
-  const getCategory = async () => {
+  /**
+   * Function to get all category list using a GET API
+   */
+  const getAllCategory = async () => {
     const response = await fetch('http://localhost:3000/api/categories', {
       method: 'GET',
       headers: {
@@ -114,12 +144,20 @@ export default function AddEditNote() {
     });
     const json = await response.json();
     console.log(' AddNote Page Category apiOut actual', json);
-
-    let tempCat = transformCategoryData(json);
-    console.log('after trans data', tempCat);
-    setCategories(tempCat);
+    if (json.error === false && json.result !== null) {
+      let tempCat = transformCategoryData(json.result);
+      console.log('after trans data', tempCat);
+      setCategories(tempCat);
+    } else {
+      console.error('error found');
+    }
   };
 
+  /**
+   * This function is used to transform category data to a specific format
+   * @param {*} data
+   * @returns {id:"",label:"", value:""}
+   */
   const transformCategoryData = data => {
     return data.map(item => ({
       id: item._id, // Generates unique string ID based on index
@@ -129,7 +167,7 @@ export default function AddEditNote() {
   };
 
   return (
-    <ImageBackground source={theme} resizeMode="cover" style={{flex: 1}}>
+    <View style={{flex: 1}}>
       <View style={styles.container}>
         <TextInput
           style={styles.title}
@@ -185,164 +223,6 @@ export default function AddEditNote() {
             style={commonStyles.iconSize()}
           />
         </TouchableOpacity>
-        <Modal
-          visible={isThemeModalVisible}
-          animationType="slide"
-          onRequestClose={toggleThemeModal}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.title}>Choose Theme</Text>
-              <View style={styles.themeContainer}>
-                <TouchableOpacity
-                  onPress={() =>
-                    selectTheme(require('../asset/image/Frame_54.png'))
-                  }>
-                  <Image
-                    source={require('../asset/image/Frame_54.png')}
-                    style={styles.themeSize}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() =>
-                    selectTheme(require('../asset/image/Frame_55.png'))
-                  }>
-                  <Image
-                    source={require('../asset/image/Frame_55.png')}
-                    style={styles.themeSize}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() =>
-                    selectTheme(require('../asset/image/Frame_56.png'))
-                  }>
-                  <Image
-                    source={require('../asset/image/Frame_56.png')}
-                    style={styles.themeSize}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() =>
-                    selectTheme(require('../asset/image/Frame_57.png'))
-                  }>
-                  <Image
-                    source={require('../asset/image/Frame_57.png')}
-                    style={styles.themeSize}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() =>
-                    selectTheme(require('../asset/image/Frame_58.png'))
-                  }>
-                  <Image
-                    source={require('../asset/image/Frame_58.png')}
-                    style={styles.themeSize}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.themeContainer}>
-                <TouchableOpacity
-                  onPress={() => selectTheme(themesFrame.Frame_59)}>
-                  <Image
-                    source={require('../asset/image/Frame_59.png')}
-                    style={styles.themeSize}
-                  />
-
-                  <Image />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => selectTheme(themesFrame.Frame_60)}>
-                  <Image
-                    source={require('../asset/image/Frame_60.png')}
-                    style={styles.themeSize}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => selectTheme(themesFrame.Frame_61)}>
-                  <Image
-                    source={require('../asset/image/Frame_61.png')}
-                    style={styles.themeSize}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => selectTheme(themesFrame.Frame_62)}>
-                  <Image
-                    source={require('../asset/image/Frame_62.png')}
-                    style={styles.themeSize}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.flatListContent}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setThemeModalVisible(false);
-                  }}>
-                  <Text style={{marginTop: 10}}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={SaveButton.structure}
-                  onPress={selectThemeCategoryBack}>
-                  <Text style={SaveButton.text}>Save</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-        <Modal
-          visible={isCategoryModalVisible}
-          onRequestClose={() => {
-            setCategoryModalVisible(false);
-          }}
-          transparent={true}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.title}>Add to a category </Text>
-              <View>
-                <RadioGroup
-                  radioButtons={categories}
-                  onPress={setSelectedId}
-                  selectedId={selectedId}
-                  containerStyle={{
-                    marginTop: 10,
-                    alignItems: 'flex-start',
-                    paddingLeft: 10,
-                  }}
-                />
-              </View>
-
-              <TouchableOpacity
-                style={styles.addCategory}
-                onPress={() => {
-                  // setAddCategory(text);
-                }}>
-                <Image
-                  source={require('../asset/image/plus-01.png')}
-                  style={commonStyles.iconSize()}
-                />
-
-                <TextInput placeholder={addCategory} />
-              </TouchableOpacity>
-
-              <View style={styles.flatListContent}>
-                <TouchableOpacity
-                  // style={SaveButton.structure}
-                  onPress={() => {
-                    setCategoryModalVisible(false);
-                    selectedId(null);
-                  }}>
-                  <Text style={{marginTop: 10}}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={SaveButton.structure}
-                  onPress={() => {
-                    setCategoryModalVisible(false);
-                  }}>
-                  <Text style={SaveButton.text}>Save</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
 
         <TouchableOpacity
           style={commonStyles.fabButton(0, 0, 'none')}
@@ -355,7 +235,136 @@ export default function AddEditNote() {
           />
         </TouchableOpacity>
       </View>
-    </ImageBackground>
+      <Modal
+        visible={isThemeModalVisible}
+        animationType="slide"
+        onRequestClose={toggleThemeModal}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.title}>Choose Theme</Text>
+            <View style={styles.themeContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.backgroundContainer,
+                  {backgroundColor: '#FFEA9E'},
+                ]}
+                onPress={() => {}}></TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.backgroundContainer,
+                  {backgroundColor: 'rgb(142, 200, 218)'},
+                ]}></TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.backgroundContainer,
+                  {backgroundColor: '#C6C6C6'},
+                ]}></TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.backgroundContainer,
+                  {backgroundColor: '#9486FD'},
+                ]}></TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.backgroundContainer,
+                  {backgroundColor: '#FFA29D'},
+                ]}></TouchableOpacity>
+            </View>
+            <View style={styles.themeContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.backgroundContainer,
+                  {backgroundColor: '#96E6A1'},
+                ]}></TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.backgroundContainer,
+                  {
+                    backgroundColor: '#fff',
+                    borderColor: 'grey',
+                    borderWidth: 1,
+                  },
+                ]}></TouchableOpacity>
+            </View>
+            <View style={styles.flatListContent}>
+              <TouchableOpacity
+                onPress={() => {
+                  setThemeModalVisible(false);
+                }}>
+                <Text style={{marginTop: 10}}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={SaveButton.structure}
+                onPress={selectThemeCategoryBack}>
+                <Text style={SaveButton.text}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        visible={isCategoryModalVisible}
+        onRequestClose={() => {
+          setCategoryModalVisible(false);
+        }}
+        transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.title}>Add to a category </Text>
+            <View>
+              <RadioGroup
+                radioButtons={categories}
+                onPress={setSelectedId}
+                selectedId={selectedId}
+                containerStyle={{
+                  marginTop: 10,
+                  alignItems: 'flex-start',
+                  paddingLeft: 10,
+                }}
+              />
+            </View>
+
+            <TouchableOpacity
+              style={styles.addCategoryTxt}
+              onPress={() => {
+                postCategory();
+              }}>
+              <Image
+                source={require('../asset/image/plus-01.png')}
+                style={commonStyles.iconSize()}
+              />
+
+              <TextInput
+                placeholder="Add Category"
+                value={addCategoryTxt}
+                onChangeText={text => {
+                  setAddCategoryTxt(text);
+                }}
+              />
+            </TouchableOpacity>
+
+            <View style={styles.flatListContent}>
+              <TouchableOpacity
+                // style={SaveButton.structure}
+                onPress={() => {
+                  setCategoryModalVisible(false);
+                  setSelectedId(null);
+                }}>
+                <Text style={{marginTop: 10}}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={SaveButton.structure}
+                onPress={() => {
+                  setCategoryModalVisible(false);
+                }}>
+                <Text style={SaveButton.text}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 }
 
@@ -406,10 +415,7 @@ export const styles = StyleSheet.create({
     gap: 20,
     marginTop: 20,
   },
-  themeSize: {
-    height: 58,
-    width: 58,
-  },
+
   flatListContent: {
     marginLeft: '45%',
     display: 'flex',
@@ -419,11 +425,17 @@ export const styles = StyleSheet.create({
     gap: 12,
     textAlign: 'center',
   },
-  addCategory: {
+  addCategoryTxt: {
     display: 'flex',
     flexDirection: 'row',
     gap: 6,
     alignItems: 'center',
     paddingLeft: 20,
+  },
+  backgroundContainer: {
+    width: 58,
+    height: 58,
+    gap: 32,
+    borderRadius: 21,
   },
 });

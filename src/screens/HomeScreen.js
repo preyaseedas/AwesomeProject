@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import Card, {sty} from './Card.js';
+import Card from './Card.js';
 import {
   Text,
   View,
@@ -10,36 +10,29 @@ import {
   FlatList,
   ImageBackground,
 } from 'react-native';
-//import {FloatingAction} from 'react-native-floating-action';
-import {commonStyles, fabButton, fabIcon} from '../common/CommonStyles';
-import {RoundButton} from '../components/RoundButton';
-//import CheckBox from 'react-native-check-box';
-import CheckBox from '@react-native-community/checkbox';
+
+import {commonStyles} from '../common/CommonStyles';
+//import CheckBox from '@react-native-community/checkbox';
 
 export default function HomeScreen() {
   const [selectedItems, setSelectedItems] = useState([]);
-  const [toggleCheckBox, setToggleCheckBox] = useState(false);
-
-  const [notes, setNotes] = useState([]);
+  //const [toggleCheckBox, setToggleCheckBox] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [notes, setNotes] = useState([]);
 
   const navigation = useNavigation();
-  const data = [
-    {id: '1', title: 'All'},
-    {id: '2', title: 'Work'},
-    {id: '3', title: 'Personal'},
-  ];
 
-  //const actions = [];
-
-  const toggleChip = id => {
+  const toggleChip = x => {
     setSelectedItems(prev =>
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id],
+      prev.includes(x) ? prev.filter(item => item !== x) : [...prev, x],
     );
   };
 
   const renderItem = ({item}) => {
+    //include in javascript return boolean
+    //which checks the value inside the variable
     const isSelected = selectedItems.includes(item._id);
+
     return (
       <TouchableOpacity
         style={[
@@ -65,23 +58,6 @@ export default function HomeScreen() {
     getCategory();
   }, []);
 
-  const getNotes = async () => {
-    console.log('Start Api Call');
-    const response = await fetch('http://localhost:3000/api/notes', {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    });
-
-    const json = await response.json();
-
-    console.log('Get Note apiOut', json);
-
-    setNotes(json.result);
-  };
-
   const getCategory = async () => {
     const response = await fetch('http://localhost:3000/api/categories', {
       method: 'GET',
@@ -92,23 +68,73 @@ export default function HomeScreen() {
     });
     const json = await response.json();
     console.log('Category apiOut', json);
-
-    setCategories(json);
+    if (json.error === false && json.result !== null) {
+      setCategories(json.result);
+    } else {
+      console.error(json.message);
+    }
   };
 
+  const getNotes = async () => {
+    const response = await fetch('http://localhost:3000/api/notes', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const json = await response.json();
+    console.log('Get Note api json', json);
+
+    if (json.error === false && json.result !== null) {
+      console.log('Notes: ', json.result);
+
+      setNotes(json.result);
+    } else {
+      console.error(json.message);
+    }
+  };
+
+  /**
+   * method to create the note in a specific category
+   */
+  // const postNoteToCategory = async () => {
+  //   let body = {
+  //     categoryIds: [selectedId],
+  //   };
+
+  //   const response = await fetch('http://localhost:3000/api/notes/categories', {
+  //     method: 'POST',
+  //     headers: {
+  //       Accept: 'application/json',
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify(body),
+  //   });
+
+  //   const json = await response.json();
+
+  //   if (json.error === false && json.result !== null) {
+  //     console.log('visible in specific category', json.result);
+  //   } else {
+  //     console.error(json.message);
+  //   }
+
+  //   //postNote();
+  // };
+
   return (
-    <ImageBackground
-      source={require('../asset/image/Frame_60.png')}
-      style={[styles.container]}>
+    <View style={[styles.container]}>
       <View>
         <View style={styles.nav}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => {}}>
             <Image
               source={require('../asset/image/Search.png')}
               style={[commonStyles.iconSize()]}
             />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => {}}>
             <Image
               source={require('../asset/image/threeDot.png')}
               style={[commonStyles.iconSize()]}
@@ -173,7 +199,7 @@ export default function HomeScreen() {
           style={commonStyles.iconSize()}
         />
       </TouchableOpacity>
-    </ImageBackground>
+    </View>
   );
 }
 
