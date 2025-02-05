@@ -22,10 +22,26 @@ export default function HomeScreen() {
 
   const navigation = useNavigation();
 
-  const toggleChip = x => {
-    setSelectedItems(prev =>
-      prev.includes(x) ? prev.filter(item => item !== x) : [...prev, x],
-    );
+  const handleOnChipClick = catId => {
+    let updatedItems = selectedItems; //Just setting the previous state of selectedItems to a variable named updateItems
+
+    //Now here doing the same operation like we did before
+    updatedItems = updatedItems.includes(catId)
+      ? updatedItems.filter(item => item !== catId)
+      : [...updatedItems, catId];
+
+    console.log('updated items', updatedItems);
+
+    //Now just set the updatedItems which is now updated with add or delete as per above logics
+    setSelectedItems(updatedItems);
+
+    //Get Notes by selected category ids
+    getNoteByCategories(updatedItems);
+
+    //when there is no category selected, it will show all the card(notes)
+    if (updatedItems.length === 0) {
+      getNotes();
+    }
   };
 
   const renderItem = ({item}) => {
@@ -39,7 +55,9 @@ export default function HomeScreen() {
           styles.chip,
           {backgroundColor: isSelected ? '#0B162B' : 'transparent'},
         ]}
-        onPress={() => toggleChip(item._id)}>
+        onPress={() => {
+          handleOnChipClick(item._id);
+        }}>
         <Text
           style={[styles.chipText, {color: isSelected ? '#fff' : '#0B162B'}]}>
           {item.name}
@@ -99,30 +117,31 @@ export default function HomeScreen() {
   /**
    * method to create the note in a specific category
    */
-  // const postNoteToCategory = async () => {
-  //   let body = {
-  //     categoryIds: [selectedId],
-  //   };
+  const getNoteByCategories = async selectedCatId => {
+    let body = {
+      categoryIds: selectedCatId, //SelectedItem itself is an array like [ 2, 3 , 56], so don't need to wrap inside []
+    };
+    console.log('selected items body', body);
 
-  //   const response = await fetch('http://localhost:3000/api/notes/categories', {
-  //     method: 'POST',
-  //     headers: {
-  //       Accept: 'application/json',
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify(body),
-  //   });
+    const response = await fetch('http://localhost:3000/api/notes/categories', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
 
-  //   const json = await response.json();
+    const json = await response.json();
 
-  //   if (json.error === false && json.result !== null) {
-  //     console.log('visible in specific category', json.result);
-  //   } else {
-  //     console.error(json.message);
-  //   }
+    if (json.error === false && json.result !== null) {
+      console.log('visible in specific category', json.result);
+      setNotes(json.result);
+    } else {
+    }
 
-  //   //postNote();
-  // };
+    //postNote();
+  };
 
   return (
     <View style={[styles.container]}>
