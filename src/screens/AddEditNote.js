@@ -18,9 +18,13 @@ import {useNavigation} from '@react-navigation/native';
 import {SaveButton} from '../components/SaveButton';
 import {style} from './Reminder';
 import Reminder from './Reminder';
+import {useSelector} from 'react-redux';
 
 export default function AddEditNote() {
   const navigation = useNavigation();
+
+  const categories = useSelector(state => state.noteReducer.categories);
+
   const [theme, setTheme] = useState(require('../asset/image/Frame_60.png'));
   const [selectedTheme, setSelectedTheme] = useState(
     require('../asset/image/Frame_60.png'),
@@ -38,7 +42,7 @@ export default function AddEditNote() {
   //usestate  for description
   const [description, setDescription] = useState('');
 
-  const [categories, setCategories] = useState([]);
+  const [transformedCategories, setTransformedCategories] = useState([]);
 
   const toggleThemeModal = () => {
     setThemeModalVisible(!isThemeModalVisible);
@@ -72,7 +76,6 @@ export default function AddEditNote() {
     setAddCategoryTxt('');
 
     //Get updated category list after creating a new category
-    getAllCategory();
   };
 
   /**
@@ -101,42 +104,46 @@ export default function AddEditNote() {
     const json = await response.json();
     console.log('apiOut', json);
 
-    // navigation.navigate('Home');
+    //TODO: get all notes again or update note list in reducer
+
+    navigation.goBack();
   };
 
   // to execute get all categories 1st time and once when screen is opened
   useEffect(() => {
-    getAllCategory();
-  }, []);
+    let tempCat = handleTransformCates(categories);
+
+    setTransformedCategories(tempCat);
+  }, [categories]);
 
   /**
    * Function to get all category list using a GET API
    */
-  const getAllCategory = async () => {
-    const response = await fetch('http://localhost:3000/api/categories', {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    });
-    const json = await response.json();
-    console.log(' AddNote Page Category apiOut actual', json);
-    if (json.error === false && json.result !== null) {
-      let tempCat = transformCategoryData(json.result);
-      console.log('after trans data', tempCat);
-      setCategories(tempCat);
-    } else {
-      console.error('error found');
-    }
-  };
+  // const getAllCategory = async () => {
+  // const response = await fetch('http://localhost:3000/api/categories', {
+  //   method: 'GET',
+  //   headers: {
+  //     Accept: 'application/json',
+  //     'Content-Type': 'application/json',
+  //   },
+  // });
+  // const json = await response.json();
+  // console.log(' AddNote Page Category apiOut actual', json);
+  // if (json.error === false && json.result !== null) {
+  // let tempCat = handleTransformCates(json.result);
+  // console.log('after trans data', tempCat);
+  // setCategories(tempCat);
+  // } else {
+  //   console.error('error found');
+  // }
+  // };
 
   /**
    * This function is used to transform category data to a specific format
    * @param {*} data
    * @returns {id:"",label:"", value:""}
    */
-  const transformCategoryData = data => {
+  const handleTransformCates = data => {
     return data.map(item => ({
       id: item._id, // Generates unique string ID based on index
       label: item.name, // Use name if available, otherwise fallback
@@ -294,7 +301,7 @@ export default function AddEditNote() {
             <Text style={styles.title}>Add to a category </Text>
             <View>
               <RadioGroup
-                radioButtons={categories}
+                radioButtons={transformedCategories}
                 onPress={setSelectedId}
                 selectedId={selectedId}
                 containerStyle={{

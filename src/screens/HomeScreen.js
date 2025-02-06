@@ -12,15 +12,24 @@ import {
 } from 'react-native';
 
 import {commonStyles} from '../common/CommonStyles';
+import {useDispatch, useSelector} from 'react-redux';
+import {setCategories, setNotes} from '../redux/NoteSlice.js';
 //import CheckBox from '@react-native-community/checkbox';
 
 export default function HomeScreen() {
   const [selectedItems, setSelectedItems] = useState([]);
   //const [toggleCheckBox, setToggleCheckBox] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [notes, setNotes] = useState([]);
+  //const [categories, setCategories] = useState([]);
+  // const [notes, setNotes] = useState([]);
+
+  // noteReducer is the name of store reducer variable which is initialized by the exported reducer of noteSlice
+  // where last notes is a state of reducer slice and first notes is just a variable name
+  const notes = useSelector(state => state.noteReducer.notes);
+  const categories = useSelector(state => state.noteReducer.categories);
 
   const navigation = useNavigation();
+
+  const dispatch = useDispatch();
 
   const handleOnChipClick = catId => {
     let updatedItems = selectedItems; //Just setting the previous state of selectedItems to a variable named updateItems
@@ -87,7 +96,8 @@ export default function HomeScreen() {
     const json = await response.json();
     console.log('Category apiOut', json);
     if (json.error === false && json.result !== null) {
-      setCategories(json.result);
+      dispatch(setCategories(json.result));
+      //setCategories(json.result);
     } else {
       console.error(json.message);
     }
@@ -108,7 +118,9 @@ export default function HomeScreen() {
     if (json.error === false && json.result !== null) {
       console.log('Notes: ', json.result);
 
-      setNotes(json.result);
+      dispatch(setNotes(json.result));
+
+      // setNotes(json.result);
     } else {
       console.error(json.message);
     }
@@ -136,7 +148,8 @@ export default function HomeScreen() {
 
     if (json.error === false && json.result !== null) {
       console.log('visible in specific category', json.result);
-      setNotes(json.result);
+      dispatch(setNotes(json.result));
+      // setNotes(json.result);
     } else {
     }
 
