@@ -8,21 +8,30 @@ import AddEditNote from './src/screens/AddEditNote';
 
 import Reminder from './src/screens/Reminder.js';
 import Card from './src/screens/Card.js';
+import {Provider} from 'react-redux';
+import store from './src/redux/Store.js';
+import VariableCounterScreen from './src/screens/VariableCounterScreen.js';
+import VariableCounterScreen2 from './src/screens/VariableCounterScreen2.js';
 
 const Stack = createNativeStackNavigator();
 
 function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Splash" component={SplashScreen} />
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+          <Stack.Screen name="Splash" component={SplashScreen} />
 
-        <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Home" component={HomeScreen} />
 
-        <Stack.Screen name="AddNote" component={AddEditNote} />
-        <Stack.Screen name="Remind" component={Reminder} />
-      </Stack.Navigator>
-    </NavigationContainer>
+          <Stack.Screen name="AddNote" component={AddEditNote} />
+          <Stack.Screen name="Remind" component={Reminder} />
+
+          <Stack.Screen name="Counter" component={VariableCounterScreen} />
+          <Stack.Screen name="Counter2" component={VariableCounterScreen2} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }
 
