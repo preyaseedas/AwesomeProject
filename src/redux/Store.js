@@ -4,7 +4,7 @@ import noteSlice from '../redux/NoteSlice';
 
 const store = configureStore({
   reducer: {
-    counterRName: counterReducer,
+    // counterRName: counterReducer,
     noteReducer: noteSlice,
   },
 });

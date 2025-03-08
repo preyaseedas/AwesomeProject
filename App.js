@@ -12,6 +12,7 @@ import {Provider} from 'react-redux';
 import store from './src/redux/Store.js';
 import VariableCounterScreen from './src/screens/VariableCounterScreen.js';
 import VariableCounterScreen2 from './src/screens/VariableCounterScreen2.js';
+import NewEditNote from './src/screens/NewEditNote.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,7 +21,7 @@ function App() {
     <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          <Stack.Screen name="Splash" component={SplashScreen} />
+          {/** <Stack.Screen name="Splash" component={SplashScreen} />*/}
 
           <Stack.Screen name="Home" component={HomeScreen} />
 
@@ -29,6 +30,7 @@ function App() {
 
           <Stack.Screen name="Counter" component={VariableCounterScreen} />
           <Stack.Screen name="Counter2" component={VariableCounterScreen2} />
+          <Stack.Screen name="NewEdit" component={NewEditNote} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

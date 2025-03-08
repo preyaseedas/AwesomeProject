@@ -1,7 +1,7 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {commonStyles} from '../common/CommonStyles';
-import {Calendar,} from 'react-native-calendars';
+import {Calendar} from 'react-native-calendars';
 import {
   View,
   Modal,
@@ -16,14 +16,17 @@ import {SaveButton} from '../components/SaveButton';
 
 import ToggleSwitch from 'toggle-switch-react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import DatePicker from 'react-native-date-picker';
+import Card from './Card';
 
-
-{/*LocaleConfig.locales['fr'] = {dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+{
+  /*LocaleConfig.locales['fr'] = {dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
 dayNamesShort: ['D', 'L', 'M', 'M.', 'J', 'V', 'S'],};
-LocaleConfig.defaultLocale = 'fr';*/}
+LocaleConfig.defaultLocale = 'fr';*/
+}
 
 export default function Reminder() {
-  const navigation = useNavigation('');
+  const navigation = useNavigation();
   const [isReminderModalVisible, setReminderModalVisible] = useState(true);
 
   const today = new Date().toISOString().split('T')[0];
@@ -45,9 +48,12 @@ export default function Reminder() {
     setSelectedDate(day.dateString);
   };
 
+  const handleReminder = () => {
+    setReminderModalVisible(false);
+  };
+
   return (
     <View>
-      <Text>DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD</Text>
       <Modal transparent={true} visible={isReminderModalVisible}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -67,9 +73,13 @@ export default function Reminder() {
               </TouchableOpacity>
             </View>
             <View style={style.container}>
-              <Text>01:58 PM</Text>
+              <Text>{selectedTime.toLocaleTimeString()}</Text>
 
-              <TouchableOpacity onPress={() => setTimeModal(true) && isReminderModalVisible(false)}>
+              <TouchableOpacity
+                onPress={() => {
+                  setTimeModal(true);
+                  setReminderModalVisible(false);
+                }}>
                 <Image
                   source={require('../asset/image/clock-01.png')}
                   style={commonStyles.iconSize()}
@@ -98,7 +108,7 @@ export default function Reminder() {
               <TouchableOpacity
                 style={SaveButton.structure}
                 onPress={() => {
-                  navigation.navigate(-1);
+                  handleReminder();
                 }}>
                 <Text style={SaveButton.text}>Save</Text>
               </TouchableOpacity>
@@ -158,11 +168,34 @@ export default function Reminder() {
 
       <Modal visible={timeModal} transparent={true}>
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={{fontSize: 14, color: 'black', marginBottom: 20}}>
+          <View style={[styles.modalContent]}>
+            <Text style={{fontSize: 16, color: 'black', marginBottom: 20}}>
               Add Time
             </Text>
-            <DateTimePicker  value={selectedTime} mode="time" display="spinner"  onChange={()=>{setSelectedTime()}} />
+            {/**  <DateTimePicker
+              value={selectedTime}
+              mode="time"
+              display="spinner"
+              onChange={(event, date) => {
+                if (date) {
+                  setSelectedTime(date);
+                }
+              }}
+            />*/}
+            {/** <DatePicker
+              modal
+              style={styles.modalContainer}
+              open={timeModal}
+              date={selectedTime}
+              mode="time"
+            />*/}
+            <View style={{alignItems: 'center', display: 'flex'}}>
+              <DatePicker
+                mode="time"
+                date={selectedTime}
+                onDateChange={setSelectedTime}
+              />
+            </View>
             <View style={styles.flatListContent}>
               <TouchableOpacity
                 // style={SaveButton.structure}
@@ -173,13 +206,15 @@ export default function Reminder() {
               </TouchableOpacity>
               <TouchableOpacity
                 style={SaveButton.structure}
-                onPress={() => setTimeModal(false)}>
+                onPress={() => {
+                  setTimeModal(false);
+                  setReminderModalVisible(true);
+                }}>
                 <Text style={SaveButton.text}>Save</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-        
       </Modal>
     </View>
   );

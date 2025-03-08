@@ -1,19 +1,19 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {Image, Text, View} from 'react-native';
 import {StyleSheet} from 'react-native';
+import {commonStyles} from '../common/CommonStyles';
 //import AddEditNote from './src/screens/AddEditNote';
 
 export default function Card(props) {
   return (
-    // <View style={sty.cardContainer}>
-    //   <Text> 5.23 PM</Text>
-    //   <Text style={sty.cardHeading}>Today's Note</Text>
-    //   <Text style={{marginTop: 10}} multiline={true}>
-    //     BBBBBBBBBBBBBBBBBBBBGGGGGGGGGGGGGGGGGGbbbbbbbbbbbbbbbbbbbbbbbbbb
-    //   </Text>
-    // </View>
-
     <View style={sty.card}>
+      <View style={sty.remindCardStyle}>
+        <Text style={{color: 'red'}}>{props.selectedTimer}</Text>
+        <Image
+          source={require('../asset/image/clock-01.png')}
+          style={commonStyles.iconSize()}
+        />
+      </View>
       <Text style={sty.title}>{props.title}</Text>
       <Text style={sty.description}>{props.description}</Text>
     </View>
@@ -65,5 +65,10 @@ export const sty = StyleSheet.create({
   description: {
     fontSize: 14,
     color: '#6c757d',
+  },
+  remindCardStyle: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });

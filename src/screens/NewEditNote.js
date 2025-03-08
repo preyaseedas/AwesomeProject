@@ -14,47 +14,39 @@ import {
 import {RadioGroup} from 'react-native-radio-buttons-group';
 
 import {commonStyles} from '../common/CommonStyles';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {SaveButton} from '../components/SaveButton';
 import {style} from './Reminder';
 import Reminder from './Reminder';
 import {useSelector, useDispatch} from 'react-redux';
+import {updateNote} from '../redux/NoteSlice';
 
-import {addNote} from '../redux/NoteSlice';
-
-export default function AddEditNote() {
+export default function NewEditNote() {
   const navigation = useNavigation();
+  const route = useRoute();
 
   const dispatch = useDispatch();
 
+  //  Check if navigating with an existing note
+  const existingNote = route.params.note;
+  console.log('Received Note:', route.params.note);
+
   const categories = useSelector(state => state.noteReducer.categories);
 
-  const [tempTheme, setTempTheme] = useState({backgroundColor: 'transparent'});
-  const [selectedTheme, setSelectedTheme] = useState({
-    backgroundColor: 'transparent',
-  });
-
-  const chooseTheme = selectedColor => {
-    //select the color from the theme model when we press on a particular color
-    setTempTheme({backgroundColor: selectedColor});
-  };
-
+  //const [theme, setTheme] = useState(require('../asset/image/Frame_60.png'));
+  //const [selectedTheme, setSelectedTheme] = useState(require('../asset/image/Frame_60.png'), );
   const [isThemeModalVisible, setThemeModalVisible] = useState(false); // MODEL TO CHOOSE THEME
   const [isCategoryModalVisible, setCategoryModalVisible] = useState(false); //TO SET THEME IN WHICH CATEGORY
-  {
-    /**
   const [isReminderModalVisible, setReminderModalVisible] = useState(true);
-   */
-  }
 
   const [selectedId, setSelectedId] = useState(null); //for radio box selection
 
   const [addCategoryTxt, setAddCategoryTxt] = useState('');
 
   //usestate for title                 3
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(existingNote.title);
   //usestate  for description
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState(existingNote.content);
 
   const [transformedCategories, setTransformedCategories] = useState([]);
 
@@ -62,6 +54,10 @@ export default function AddEditNote() {
 
   const toggleThemeModal = () => {
     setThemeModalVisible(!isThemeModalVisible);
+  };
+
+  const toggleReminderModal = () => {
+    setReminderModalVisible(!isReminderModalVisible);
   };
 
   /**
@@ -93,8 +89,8 @@ export default function AddEditNote() {
   /**
    * postNote method is used to create note from user input using POST API
    */
-  const postNote = async () => {
-    console.log('Start Api Calling');
+  const updateNotebyId = async () => {
+    let api = `http://localhost:3000/api/notes/${existingNote._id}`;
 
     let body = {
       title: title, // Pass the title from state
@@ -102,10 +98,11 @@ export default function AddEditNote() {
       categories: [selectedId],
     };
 
-    console.log('Post Api body', body);
+    console.log('Put Api body', body);
+    console.log('Put Api ', api);
 
-    const response = await fetch('http://localhost:3000/api/notes', {
-      method: 'POST',
+    const response = await fetch(api, {
+      method: 'PUT',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -114,10 +111,10 @@ export default function AddEditNote() {
     });
 
     const json = await response.json();
-    console.log('apiOut', json);
-    dispatch(addNote(json.result));
-    //TODO: get all notes again or update note list in reducer
+    console.log('apiOut after updating', json);
 
+    //TODO: get all notes again or update note list in reducer
+    dispatch(updateNote(json.result));
     navigation.goBack();
   };
 
@@ -127,28 +124,6 @@ export default function AddEditNote() {
 
     setTransformedCategories(tempCat);
   }, [categories]);
-
-  /**
-   * Function to get all category list using a GET API
-   */
-  // const getAllCategory = async () => {
-  // const response = await fetch('http://localhost:3000/api/categories', {
-  //   method: 'GET',
-  //   headers: {
-  //     Accept: 'application/json',
-  //     'Content-Type': 'application/json',
-  //   },
-  // });
-  // const json = await response.json();
-  // console.log(' AddNote Page Category apiOut actual', json);
-  // if (json.error === false && json.result !== null) {
-  // let tempCat = handleTransformCates(json.result);
-  // console.log('after trans data', tempCat);
-  // setCategories(tempCat);
-  // } else {
-  //   console.error('error found');
-  // }
-  // };
 
   /**
    * This function is used to transform category data to a specific format
@@ -165,7 +140,7 @@ export default function AddEditNote() {
 
   return (
     <View style={{flex: 1}}>
-      <View style={[styles.container, selectedTheme]}>
+      <View style={styles.container}>
         <TextInput
           style={styles.title}
           placeholder="Title"
@@ -222,7 +197,7 @@ export default function AddEditNote() {
         <TouchableOpacity
           style={commonStyles.fabButton(0, 0, 'none')}
           onPress={() => {
-            postNote();
+            updateNotebyId();
           }}>
           <Image
             source={require('../asset/image/check.png')}
@@ -239,22 +214,50 @@ export default function AddEditNote() {
           <View style={styles.modalContent}>
             <Text style={styles.title}>Choose Theme</Text>
             <View style={styles.themeContainer}>
-              {[
-                '#FFEA9E',
-                'rgb(142, 200, 218)',
-                '#C6C6C6',
-                '#9486FD',
-                '#FFA29D',
-                '#96E6A1',
-                '#FFFFFF',
-              ].map(color => (
-                <TouchableOpacity
-                  key={color}
-                  style={[styles.backgroundContainer, {backgroundColor: color}]}
-                  onPress={() => chooseTheme(color)}></TouchableOpacity>
-              ))}
+              <TouchableOpacity
+                style={[
+                  styles.backgroundContainer,
+                  {backgroundColor: '#FFEA9E'},
+                ]}
+                onPress={() => {}}></TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.backgroundContainer,
+                  {backgroundColor: 'rgb(142, 200, 218)'},
+                ]}></TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.backgroundContainer,
+                  {backgroundColor: '#C6C6C6'},
+                ]}></TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.backgroundContainer,
+                  {backgroundColor: '#9486FD'},
+                ]}></TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.backgroundContainer,
+                  {backgroundColor: '#FFA29D'},
+                ]}></TouchableOpacity>
             </View>
+            <View style={styles.themeContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.backgroundContainer,
+                  {backgroundColor: '#96E6A1'},
+                ]}></TouchableOpacity>
 
+              <TouchableOpacity
+                style={[
+                  styles.backgroundContainer,
+                  {
+                    backgroundColor: '#fff',
+                    borderColor: 'grey',
+                    borderWidth: 1,
+                  },
+                ]}></TouchableOpacity>
+            </View>
             <View style={styles.flatListContent}>
               <TouchableOpacity
                 onPress={() => {
@@ -262,12 +265,7 @@ export default function AddEditNote() {
                 }}>
                 <Text style={{marginTop: 10}}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={SaveButton.structure}
-                onPress={() => {
-                  setSelectedTheme(tempTheme); // to finally save the selected theme as background
-                  setThemeModalVisible(false);
-                }}>
+              <TouchableOpacity style={SaveButton.structure} onPress={() => {}}>
                 <Text style={SaveButton.text}>Save</Text>
               </TouchableOpacity>
             </View>

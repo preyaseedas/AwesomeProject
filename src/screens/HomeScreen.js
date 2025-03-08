@@ -8,16 +8,21 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Pressable,
   ImageBackground,
+  Modal,
 } from 'react-native';
 
 import {commonStyles} from '../common/CommonStyles';
 import {useDispatch, useSelector} from 'react-redux';
 import {setCategories, setNotes} from '../redux/NoteSlice.js';
+import {deleteNotes} from '../redux/NoteSlice.js';
+
 //import CheckBox from '@react-native-community/checkbox';
 
 export default function HomeScreen() {
   const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedCard, setSelectedCard] = useState([]);
   //const [toggleCheckBox, setToggleCheckBox] = useState(false);
   //const [categories, setCategories] = useState([]);
   // const [notes, setNotes] = useState([]);
@@ -26,6 +31,8 @@ export default function HomeScreen() {
   // where last notes is a state of reducer slice and first notes is just a variable name
   const notes = useSelector(state => state.noteReducer.notes);
   const categories = useSelector(state => state.noteReducer.categories);
+
+  const [optionModelVisible, setOptionModelVisible] = useState(false);
 
   const navigation = useNavigation();
 
@@ -74,9 +81,61 @@ export default function HomeScreen() {
       </TouchableOpacity>
     );
   };
+  {
+    /*
+  const handleOnLongPress = id => {
+    setSelectedCard(prevSelected => {
+      prevSelected.includes(id)
+        ? prevSelected.filter(noteId => noteId !== noteId) // Remove if already selected
+        : [...prevSelected, id]; //add if selected
+    });
+  };
 
   const renderNotes = ({item}) => {
-    return <Card title={item.title} description={item.content} />;
+    //include in javascript return boolean
+    //which checks the value inside the variable
+    const isSelectedCard = selectedCard.includes(item._id);
+    return (
+      <TouchableOpacity
+        style={{backgroundColor: isSelectedCard ? 'green' : 'transparent'}}
+        onPress={() =>
+          navigation.navigate('NewEdit', {
+            note: item,
+            // onNoteUpdated: updateSingleNote, // Pass update function
+          })
+        }
+        onLongPress={() => {
+          handleOnLongPress(item._id);
+        }}>
+        <Card title={item.title} description={item.content} />
+      </TouchableOpacity>
+    );
+  };
+*/
+  }
+
+  const handleOnLongPress = id => {
+    setSelectedCard(prevSelected =>
+      prevSelected.includes(id)
+        ? prevSelected.filter(noteId => noteId !== id)
+        : [...prevSelected, id],
+    );
+    console.log('selected card', setSelectedCard);
+  };
+
+  const renderNotes = ({item}) => {
+    const isSelectedCard =
+      Array.isArray(selectedCard) && selectedCard.includes(item._id);
+    return (
+      <TouchableOpacity
+        style={isSelectedCard ? styles.cardSelect : 'transparent'}
+        onPress={() => {
+          navigation.navigate('NewEdit', {note: item});
+        }}
+        onLongPress={() => handleOnLongPress(item._id)}>
+        <Card title={item.title} description={item.content} />
+      </TouchableOpacity>
+    );
   };
 
   // UseEffect to do a get api call to fetch all notes
@@ -126,6 +185,8 @@ export default function HomeScreen() {
     }
   };
 
+  // Function to update only the edited note in Redux store
+
   /**
    * method to create the note in a specific category
    */
@@ -156,6 +217,35 @@ export default function HomeScreen() {
     //postNote();
   };
 
+  const handleDeleteNote = async () => {
+    const response = await fetch(
+      `http://localhost:3000/api/notes/${selectedCard}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    const json = await response.json();
+    console.log('deleted api', json);
+
+    if (json.error === false) {
+      console.log('Notes: ', json.result);
+
+      dispatch(deleteNotes(selectedCard));
+      console.log('selected card', selectedCard);
+
+      setSelectedCard([]); // Clear selection after deletion
+      setOptionModelVisible(false);
+    } else {
+      console.error(json.message);
+    }
+  };
+  const handleArchiveNote = () => {};
+
   return (
     <View style={[styles.container]}>
       <View>
@@ -166,12 +256,50 @@ export default function HomeScreen() {
               style={[commonStyles.iconSize()]}
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity
+            onPress={() => {
+              setOptionModelVisible(!optionModelVisible);
+            }}>
             <Image
               source={require('../asset/image/threeDot.png')}
               style={[commonStyles.iconSize()]}
             />
           </TouchableOpacity>
+          <Modal
+            visible={optionModelVisible}
+            onRequestClose={() => {
+              setOptionModelVisible(false);
+            }}
+            transparent={true}>
+            <View style={styles.optionContainer}>
+              <TouchableOpacity
+                style={{display: 'flex', flexDirection: 'row', gap: 10}}
+                onPress={() => {
+                  handleArchiveNote();
+                }}>
+                <Image
+                  source={require('../asset/image/folder.png')}
+                  style={{height: 20, width: 20}}
+                />
+                <Text>Archive</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: 10,
+                  marginTop: 10,
+                }}
+                onPress={() => handleDeleteNote()}>
+                <Image
+                  source={require('../asset/image/trash.png')}
+                  style={{height: 20, width: 20}}
+                />
+                <Text>trash</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
         </View>
 
         {/* Horizontal FlatList */}
@@ -292,5 +420,31 @@ const styles = StyleSheet.create({
   checkbox: {
     borderRadius: '50%',
     borderColor: 'red',
+  },
+  optionContainer: {
+    display: 'flex',
+
+    width: 149,
+    borderColor: 'grey',
+
+    borderWidth: 1,
+    height: 80,
+    top: '7%',
+    backgroundColor: 'white',
+    marginLeft: '60%',
+    //paddingRight: 20,
+    padding: 12,
+    borderRadius: 20,
+  },
+  cardSelect: {
+    backgroundColor: 'green',
+    border: 1,
+    borderWidth: 1,
+    borderRadius: 8,
+    shadowColor: 'none',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.0,
+    shadowRadius: 0,
+    elevation: 0,
   },
 });

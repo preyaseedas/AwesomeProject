@@ -13,12 +13,27 @@ const NoteSlice = createSlice({
     setCategories: (state, action) => {
       state.categories = action.payload;
     },
+    addNote: (state, action) => {
+      state.notes = state.notes.concat(action.payload);
+    },
+    updateNote: (state, action) => {
+      state.notes = state.notes.map(item =>
+        item._id === action.payload._id ? action.payload : item,
+      );
+    },
+    deleteNotes: (state, action) => {
+      console.log('payload', action.payload);
+      state.notes = state.notes.filter(
+        note => !action.payload.includes(note._id),
+      );
+    },
   },
 });
 
 export default NoteSlice.reducer;
 
-export const {setNotes, setCategories} = NoteSlice.actions;
+export const {setNotes, setCategories, addNote, updateNote, deleteNotes} =
+  NoteSlice.actions;
 
 //Store == Global Store to manage all the reducer and states
 //Reducer == what actually need to do
