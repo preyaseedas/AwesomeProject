@@ -29,14 +29,12 @@ export default function AddEditNote() {
 
   const categories = useSelector(state => state.noteReducer.categories);
 
-  const [tempTheme, setTempTheme] = useState({backgroundColor: 'transparent'});
-  const [selectedTheme, setSelectedTheme] = useState({
-    backgroundColor: 'transparent',
-  });
+  const [tempTheme, setTempTheme] = useState('#FFFFFF');
+  const [selectedTheme, setSelectedTheme] = useState('#FFFFFF');
 
   const chooseTheme = selectedColor => {
     //select the color from the theme model when we press on a particular color
-    setTempTheme({backgroundColor: selectedColor});
+    setTempTheme(selectedColor);
   };
 
   const [isThemeModalVisible, setThemeModalVisible] = useState(false); // MODEL TO CHOOSE THEME
@@ -100,6 +98,10 @@ export default function AddEditNote() {
       title: title, // Pass the title from state
       content: description, // Pass the description from state
       categories: [selectedId],
+      theme: {
+        type: 'color',
+        value: selectedTheme,
+      },
     };
 
     console.log('Post Api body', body);
@@ -165,7 +167,7 @@ export default function AddEditNote() {
 
   return (
     <View style={{flex: 1}}>
-      <View style={[styles.container, selectedTheme]}>
+      <View style={[styles.container, {backgroundColor: selectedTheme}]}>
         <TextInput
           style={styles.title}
           placeholder="Title"
@@ -241,7 +243,7 @@ export default function AddEditNote() {
             <View style={styles.themeContainer}>
               {[
                 '#FFEA9E',
-                'rgb(142, 200, 218)',
+                '#8EC8DA',
                 '#C6C6C6',
                 '#9486FD',
                 '#FFA29D',

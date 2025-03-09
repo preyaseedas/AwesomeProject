@@ -6,7 +6,8 @@ import {commonStyles} from '../common/CommonStyles';
 
 export default function Card(props) {
   return (
-    <View style={sty.card}>
+    <View
+      style={[sty.card, {backgroundColor: props.theme?.value || '#ffffff'}]}>
       <View style={sty.remindCardStyle}>
         <Text style={{color: 'red'}}>{props.selectedTimer}</Text>
         <Image

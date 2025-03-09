@@ -133,7 +133,11 @@ export default function HomeScreen() {
           navigation.navigate('NewEdit', {note: item});
         }}
         onLongPress={() => handleOnLongPress(item._id)}>
-        <Card title={item.title} description={item.content} />
+        <Card
+          title={item.title}
+          description={item.content}
+          theme={item.theme}
+        />
       </TouchableOpacity>
     );
   };
