@@ -17,6 +17,7 @@ import {commonStyles} from '../common/CommonStyles';
 import {useDispatch, useSelector} from 'react-redux';
 import {setCategories, setNotes} from '../redux/NoteSlice.js';
 import {deleteNotes} from '../redux/NoteSlice.js';
+import moment from 'moment';
 
 //import CheckBox from '@react-native-community/checkbox';
 
@@ -128,15 +129,18 @@ export default function HomeScreen() {
       Array.isArray(selectedCard) && selectedCard.includes(item._id);
     return (
       <TouchableOpacity
-        style={isSelectedCard ? styles.cardSelect : 'transparent'}
+        style={
+          isSelectedCard ? styles.cardSelect : {backgroundColor: 'transparent'}
+        }
         onPress={() => {
-          navigation.navigate('NewEdit', {note: item});
+          navigation.navigate('NewEdit', {note: item, theme: item});
         }}
         onLongPress={() => handleOnLongPress(item._id)}>
         <Card
           title={item.title}
           description={item.content}
           theme={item.theme}
+          createdAt={item.createdAt}
         />
       </TouchableOpacity>
     );
@@ -177,6 +181,9 @@ export default function HomeScreen() {
 
     const json = await response.json();
     console.log('Get Note api json', json);
+
+    const formattedTime = moment(json.result.createdAt);
+    console.log('time conversion', formattedTime);
 
     if (json.error === false && json.result !== null) {
       console.log('Notes: ', json.result);
@@ -223,7 +230,7 @@ export default function HomeScreen() {
 
   const handleDeleteNote = async () => {
     const response = await fetch(
-      `http://localhost:3000/api/notes/${selectedCard}`,
+      `http://localhost:3000/api/notes/${selectedCard[0]}`,
       {
         method: 'DELETE',
         headers: {
@@ -316,23 +323,6 @@ export default function HomeScreen() {
           contentContainerStyle={styles.flatListContent}
         />
       </View>
-
-      {/* <View style={sty.cardContainer}>
-        <Text> 5.23 PM</Text>
-        <Text style={sty.cardHeading}>Today's Note</Text>
-        <CheckBox
-          disabled={false}
-          value={toggleCheckBox}
-          onValueChange={newValue => setToggleCheckBox(newValue)}
-        />
-      </View>
-      <View style={sty.cardContainer}>
-        <Text> 5.23 PM</Text>
-        <Text style={sty.cardHeading}>Today's Note</Text>
-        <Text style={{marginTop: 10}} multiline={true}>
-          BBBBBBBBBBBBBBBBBBBBGGGGGGGGGGGGGGGGGGbbbbbbbbbbbbbbbbbbbbbbbbbb
-        </Text>
-      </View> */}
 
       {/* Centered No Task Text */}
       <View style={styles.centerContent}>

@@ -12,6 +12,7 @@ import {
   ImageBackground,
 } from 'react-native';
 import {RadioGroup} from 'react-native-radio-buttons-group';
+import moment from 'moment';
 
 import {commonStyles} from '../common/CommonStyles';
 import {useNavigation} from '@react-navigation/native';
@@ -22,7 +23,7 @@ import {useSelector, useDispatch} from 'react-redux';
 
 import {addNote} from '../redux/NoteSlice';
 
-export default function AddEditNote() {
+export default function AddNote() {
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
@@ -32,10 +33,7 @@ export default function AddEditNote() {
   const [tempTheme, setTempTheme] = useState('#FFFFFF');
   const [selectedTheme, setSelectedTheme] = useState('#FFFFFF');
 
-  const chooseTheme = selectedColor => {
-    //select the color from the theme model when we press on a particular color
-    setTempTheme(selectedColor);
-  };
+  //const formattedTime = moment(timeString).format('hh:mm A');
 
   const [isThemeModalVisible, setThemeModalVisible] = useState(false); // MODEL TO CHOOSE THEME
   const [isCategoryModalVisible, setCategoryModalVisible] = useState(false); //TO SET THEME IN WHICH CATEGORY
@@ -60,6 +58,11 @@ export default function AddEditNote() {
 
   const toggleThemeModal = () => {
     setThemeModalVisible(!isThemeModalVisible);
+  };
+
+  const chooseTheme = selectedColor => {
+    //select the color from the theme model when we press on a particular color
+    setTempTheme(selectedColor);
   };
 
   /**
@@ -88,6 +91,7 @@ export default function AddEditNote() {
     //Get updated category list after creating a new category
   };
 
+  const currentTime = moment().format('hh:mm A'); //To get the current time
   /**
    * postNote method is used to create note from user input using POST API
    */
@@ -102,6 +106,7 @@ export default function AddEditNote() {
         type: 'color',
         value: selectedTheme,
       },
+      createdAt: currentTime,
     };
 
     console.log('Post Api body', body);
@@ -249,11 +254,21 @@ export default function AddEditNote() {
                 '#FFA29D',
                 '#96E6A1',
                 '#FFFFFF',
+                '#5f9ea0',
+                '#ffe4c4',
+                '#b0c4de',
               ].map(color => (
                 <TouchableOpacity
                   key={color}
                   style={[styles.backgroundContainer, {backgroundColor: color}]}
-                  onPress={() => chooseTheme(color)}></TouchableOpacity>
+                  onPress={() => chooseTheme(color)}>
+                  {tempTheme === color && (
+                    <Image
+                      style={styles.tickIcon}
+                      source={require('../asset/image/check-contained.png')}
+                    />
+                  )}
+                </TouchableOpacity>
               ))}
             </View>
 
@@ -409,5 +424,18 @@ export const styles = StyleSheet.create({
     height: 58,
     gap: 32,
     borderRadius: 21,
+  },
+  selectThemeBorder: {
+    color: 'black',
+    borderWidth: 2,
+    height: 58,
+    width: 58,
+  },
+  tickIcon: {
+    height: 22,
+    width: 22,
+    position: 'absolute',
+    bottom: 1,
+    right: 1,
   },
 });

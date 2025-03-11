@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-import {styles} from './AddEditNote';
+import {styles} from './AddNote';
 import {SaveButton} from '../components/SaveButton';
 
 import ToggleSwitch from 'toggle-switch-react-native';

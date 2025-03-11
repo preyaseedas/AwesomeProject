@@ -16,7 +16,7 @@ import {RadioGroup} from 'react-native-radio-buttons-group';
 import {commonStyles} from '../common/CommonStyles';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {SaveButton} from '../components/SaveButton';
-import {style} from './Reminder';
+
 import Reminder from './Reminder';
 import {useSelector, useDispatch} from 'react-redux';
 import {updateNote} from '../redux/NoteSlice';
@@ -29,7 +29,9 @@ export default function NewEditNote() {
 
   //  Check if navigating with an existing note
   const existingNote = route.params.note;
+  const previousTheme = route.params.theme;
   console.log('Received Note:', route.params.note);
+  console.log('Received theme:', route.params.theme);
 
   const categories = useSelector(state => state.noteReducer.categories);
 
@@ -52,12 +54,21 @@ export default function NewEditNote() {
 
   const [component, setComponent] = useState(null);
 
+  const [tempTheme, setTempTheme] = useState();
+  const [selectedTheme, setSelectedTheme] = useState(
+    previousTheme?.theme?.value || '',
+  );
+
   const toggleThemeModal = () => {
     setThemeModalVisible(!isThemeModalVisible);
   };
 
   const toggleReminderModal = () => {
     setReminderModalVisible(!isReminderModalVisible);
+  };
+
+  const chooseTheme = c => {
+    setTempTheme(c);
   };
 
   /**
@@ -96,6 +107,10 @@ export default function NewEditNote() {
       title: title, // Pass the title from state
       content: description, // Pass the description from state
       categories: [selectedId],
+      theme: {
+        type: 'color',
+        value: selectedTheme,
+      },
     };
 
     console.log('Put Api body', body);
@@ -139,7 +154,7 @@ export default function NewEditNote() {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={[{flex: 1}, {backgroundColor: selectedTheme}]}>
       <View style={styles.container}>
         <TextInput
           style={styles.title}
@@ -214,49 +229,27 @@ export default function NewEditNote() {
           <View style={styles.modalContent}>
             <Text style={styles.title}>Choose Theme</Text>
             <View style={styles.themeContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.backgroundContainer,
-                  {backgroundColor: '#FFEA9E'},
-                ]}
-                onPress={() => {}}></TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.backgroundContainer,
-                  {backgroundColor: 'rgb(142, 200, 218)'},
-                ]}></TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.backgroundContainer,
-                  {backgroundColor: '#C6C6C6'},
-                ]}></TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.backgroundContainer,
-                  {backgroundColor: '#9486FD'},
-                ]}></TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.backgroundContainer,
-                  {backgroundColor: '#FFA29D'},
-                ]}></TouchableOpacity>
-            </View>
-            <View style={styles.themeContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.backgroundContainer,
-                  {backgroundColor: '#96E6A1'},
-                ]}></TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.backgroundContainer,
-                  {
-                    backgroundColor: '#fff',
-                    borderColor: 'grey',
-                    borderWidth: 1,
-                  },
-                ]}></TouchableOpacity>
+              {[
+                '#FFEA9E',
+                '#8EC8DA',
+                '#C6C6C6',
+                '#9486FD',
+                '#FFA29D',
+                '#96E6A1',
+                '#FFFFFF',
+              ].map(color => (
+                <TouchableOpacity
+                  key={color}
+                  style={[styles.backgroundContainer, {backgroundColor: color}]}
+                  onPress={() => chooseTheme(color)}>
+                  {tempTheme === color && (
+                    <Image
+                      style={styles.tickIcon}
+                      source={require('../asset/image/check-contained.png')}
+                    />
+                  )}
+                </TouchableOpacity>
+              ))}
             </View>
             <View style={styles.flatListContent}>
               <TouchableOpacity
@@ -265,7 +258,12 @@ export default function NewEditNote() {
                 }}>
                 <Text style={{marginTop: 10}}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={SaveButton.structure} onPress={() => {}}>
+              <TouchableOpacity
+                style={SaveButton.structure}
+                onPress={() => {
+                  setThemeModalVisible(false);
+                  setSelectedTheme(tempTheme);
+                }}>
                 <Text style={SaveButton.text}>Save</Text>
               </TouchableOpacity>
             </View>
@@ -405,5 +403,12 @@ export const styles = StyleSheet.create({
     height: 58,
     gap: 32,
     borderRadius: 21,
+  },
+  tickIcon: {
+    height: 22,
+    width: 22,
+    position: 'absolute',
+    bottom: 1,
+    right: 1,
   },
 });

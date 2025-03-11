@@ -2,14 +2,18 @@ import React from 'react';
 import {Image, Text, View} from 'react-native';
 import {StyleSheet} from 'react-native';
 import {commonStyles} from '../common/CommonStyles';
+import moment from 'moment';
 //import AddEditNote from './src/screens/AddEditNote';
 
 export default function Card(props) {
+  const formattedTime = moment.utc(props.createdAt).local().format('hh:mm A');
   return (
     <View
       style={[sty.card, {backgroundColor: props.theme?.value || '#ffffff'}]}>
       <View style={sty.remindCardStyle}>
-        <Text style={{color: 'red'}}>{props.selectedTimer}</Text>
+        <Text style={{color: 'grey', fontSize: 12, fontFamily: 'quickstand'}}>
+          {formattedTime}
+        </Text>
         <Image
           source={require('../asset/image/clock-01.png')}
           style={commonStyles.iconSize()}
@@ -46,7 +50,7 @@ export const sty = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 16,
     marginBottom: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     shadowColor: '#000',
     borderColor: '#F2F2F2',
     borderWidth: 1,
@@ -60,8 +64,8 @@ export const sty = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
     marginBottom: 4,
+    fontWeight: 'bold',
   },
   description: {
     fontSize: 14,
